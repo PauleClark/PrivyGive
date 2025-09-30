@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --brand: #8464cf62;
+  --bg-grad-start: hsla(300, 30%, 47%, 0.185);
+  --bg-grad-end: #8d0f9442;
+  /* Card theme */
+  --card-bg: #86419623; /* blue-50 */
+  --card-border: #e7e97494; /* blue-200 */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-brand: var(--brand);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #ffffff;
+    --foreground: #000000;
+  }
+}
+
+body {
+  background-color: var(--background);
+  background-image: linear-gradient(135deg, var(--bg-grad-start) 0%, var(--bg-grad-end) 100%);
+  background-attachment: fixed;
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.card-surface {
+  background-color: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.pixel-card {
+  background: #974040;
+  border: 8px solid transparent;
+  border-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'><path fill='%239068e0' d='M0 0h8v8H0z'/><path fill='%23ffffff' d='M1 1h6v6H1z'/></svg>") 3 fill;
+  image-rendering: pixelated;
+  box-shadow: 0 2px 6px 0 rgba(144,104,224,0.12);
+}

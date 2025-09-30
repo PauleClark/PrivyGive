@@ -1,0 +1,117 @@
+[
+  {
+    "id": "proj-1759227726091",
+    "title": "(Demo)Accelerating the Web3 Future: Crowdfund the Next-Gen L1 High-Speed Blockchain!",
+    "category": "crowdfunding",
+    "description": "(Demo)\nHello, I'm Jack, a senior blockchain engineer who has contributed to multiple optimization protocols in the Ethereum ecosystem. But now, I've identified a pain point: the transaction speed and fee issues of existing L1 chains are hindering the mass adoption of Web3. I'm planning to develop a brand-new L1 blockchain using an innovative DAG consensus mechanism, achieving 100,000 transactions per second (TPS), with Gas fees as low as 0.001 ETH, while supporting seamless migration of smart contracts and DeFi.  This project requires 1000 ETH in startup funds for core team hiring, testnet deployment, and security audits. I promise: Every early supporter contributing 1 ETH will receive a 10% airdrop share of the project tokens, plus exclusive testnet access rights. Join me to ignite the high-speed engine of Web3! Once the goal is met, we'll open-source the code to benefit the entire community. Your support will reshape the blockchain world.\n\n",
+    "images": [
+      "/uploads/projects/proj-1759227726091/0.png"
+    ],
+    "hardCap": "10",
+    "minPer": "0.001",
+    "maxPer": "1",
+    "start": "2025-09-30T10:22:06.503Z",
+    "end": "2025-10-31T18:21",
+    "poolAddress": "0x6023e04436cFaF9163df6d2A7886Cd656FBe52Cc",
+    "creator": "0x9d84f24065e86e7144175d712b30df7ee94d4a90",
+    "createdAt": "2025-09-30T10:22:06.503Z"
+  },
+  {
+    "id": "proj-1759227818477",
+    "title": "(Demo)Help Jenny Achieve Her College Dream",
+    "category": "donation",
+    "description": "(Demo)\nHi, I'm Jenny, from an ordinary rural family. Dad is a truck driver, Mom takes care of the home, and we all squeeze into a tiny rental apartment. Last year, Dad lost his job due to a work injury, and medical bills and living expenses have left us in debt. I excelled in high school and was admitted to a top university to major in computer science—this is my only chance to change my fate. But tuition and living expenses total $50,000, which I can't afford, so I'm watching my dream slip away.  Through this Web3 charity platform, I sincerely appeal for donations from everyone. Every bit of kindness will go directly to my university tuition and basic living expenses, ensuring I can focus on my studies and give back to society in the future—perhaps by developing blockchain tools to help more vulnerable groups. No matter how much, your donation is a light in my heart. Thank you for making a girl's dream no longer distant.\n\n",
+    "images": [
+      "/uploads/projects/proj-1759227818477/0.png",
+      "/uploads/projects/proj-1759227818477/1.png"
+    ],
+    "hardCap": "10",
+    "minPer": "0.001",
+    "maxPer": "1",
+    "start": "2025-09-30T10:23:38.777Z",
+    "end": "2025-11-30T18:23",
+    "poolAddress": "0xE64C00d37E95e6C9f0fEF6bE8E8989Ef78C301E1",
+    "creator": "0x9d84f24065e86e7144175d712b30df7ee94d4a90",
+    "createdAt": "2025-09-30T10:23:38.777Z",
+    "contributions": [
+      {
+        "user": "0x9d84f24065e86E7144175d712B30Df7eE94D4a90",
+        "isPrivate": false,
+        "amountWei": "1000000000000000",
+        "tx": "0x53412053b4257418772404b770c59cd49d40895557c176a141f008a3d1c0f4e2",
+        "timestamp": 1759233196317
+      },
+      {
+        "user": "0x9d84f24065e86E7144175d712B30Df7eE94D4a90",
+        "isPrivate": true,
+        "tx": "0x91821abae57b37f6f79a47cc095607c7c6bcda75516da46587e962cce3712b67",
+        "timestamp": 1759233242229
+      },
+      {
+        "user": "0x9d84f24065e86E7144175d712B30Df7eE94D4a90",
+        "isPrivate": false,
+        "amountWei": "1000000000000000",
+        "tx": "0xb34fee5a769b9b71b88a87261cd905e9596cbd5eec5340369f514fffcccc7570",
+        "timestamp": 1759233613870
+      },
+      {
+        "user": "0x9d84f24065e86E7144175d712B30Df7eE94D4a90",
+        "isPrivate": true,
+        "tx": "0x6fd1748b9221ea66b06f74659b91698488bd8af0f5bc29a55585a05ebbe889ed",
+        "timestamp": 1759233674404
+      }
+    ]
+  },
+  {
+    "id": "proj-1759227902600",
+    "title": "(Demo)Fan Tips Support My NFT Art Journey",
+    "category": "sponsorship",
+    "description": "(Demo)\nI'm Alex, a digital artist and content creator obsessed with Web3. In this decentralized era, I use NFTs and animated stories to tell tales of future worlds—from DeFi heroes to metaverse explorers, each piece infused with blockchain philosophy. Over the past year, my YouTube channel and OpenSea series have attracted tens of thousands of fans, but creation requires time, money, and tech tools.  Here, I've set up a dedicated tipping page: Fans can tip instantly with ETH or stablecoins to support my ongoing high-quality content. In return, based on tipping tiers, I'll send exclusive sketches, behind-the-scenes stories, or custom NFT avatars. Imagine your tip turning into a one-of-a-kind Web3 artwork! Let's build this creative universe together—your small support is my endless inspiration for creation.\n\n",
+    "images": [
+      "/uploads/projects/proj-1759227902600/0.png",
+      "/uploads/projects/proj-1759227902600/1.png",
+      "/uploads/projects/proj-1759227902600/2.png"
+    ],
+    "hardCap": "1",
+    "minPer": "0.001",
+    "maxPer": "0.1",
+    "start": "2025-09-30T10:25:02.919Z",
+    "end": "2025-11-30T18:24",
+    "poolAddress": "0x32Ef2371Be143d0Cc286c0E64067B5AD320ea53A",
+    "creator": "0x9d84f24065e86e7144175d712b30df7ee94d4a90",
+    "createdAt": "2025-09-30T10:25:02.919Z"
+  },
+  {
+    "id": "proj-1759229209900",
+    "title": "(Demo) Sponsor Our Open-Source Tool Platform to Build the Ecosystem Together",
+    "category": "tip",
+    "description": "(Demo)\nHello everyone, I'm Sarah, the operator of a Web3 website tool platform. Our platform has served over 5,000 developers, providing one-stop DApp deployment, wallet integration, and smart contract auditing tools. Over the past two years, we've open-sourced all code for free, helping countless projects go from idea to launch. But server maintenance, team expansion, and community events require funding, and we hope to sustain the platform further through sponsorships.  We're seeking sponsorships from businesses or individuals: In the form of brand partnerships, your logo will appear on the homepage and event pages, in exchange for exclusive tool priority access, joint marketing opportunities, or even custom feature development. Imagine your brand standing alongside Web3 pioneers, driving industry innovation! Whether you're a VC fund or a tech company, your sponsorship will directly translate into ecosystem value—let's make Web3 tools more accessible and powerful together.\n\n",
+    "images": [
+      "/uploads/projects/proj-1759229209900/0.png",
+      "/uploads/projects/proj-1759229209900/1.png"
+    ],
+    "hardCap": "10",
+    "minPer": "0.001",
+    "maxPer": "1",
+    "start": "2025-09-30T10:46:50.311Z",
+    "end": "2025-11-30T23:46",
+    "poolAddress": "0x79A00EDcd5eA0e65a5cD995a34D85DaBC0b53BCC",
+    "creator": "0x9d84f24065e86e7144175d712b30df7ee94d4a90",
+    "createdAt": "2025-09-30T10:46:50.311Z",
+    "contributions": [
+      {
+        "user": "0x9d84f24065e86E7144175d712B30Df7eE94D4a90",
+        "isPrivate": false,
+        "amountWei": "1000000000000000",
+        "tx": "0xcde6e020d768a38f20545e3ea340be0a9b3286b39a09d2a5b6dd6d11d915e4fe",
+        "timestamp": 1759233736336
+      },
+      {
+        "user": "0x9d84f24065e86E7144175d712B30Df7eE94D4a90",
+        "isPrivate": true,
+        "tx": "0x9e5d135caffea3d9982501a2670d38ac36b6547747737117e3ab72d34f9b5240",
+        "timestamp": 1759233769929
+      }
+    ]
+  }
+]
