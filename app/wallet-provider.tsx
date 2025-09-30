@@ -163,8 +163,7 @@ export function HeaderWallet() {
     try {
       await connect();
     } catch (err) {
-      const msg = (err as Error)?.message || String(err);
-      alert(`请先安装 MetaMask 钱包\n\nPlease install MetaMask wallet first\n\n${msg}`);
+      console.error("Connect wallet failed:", err);
     }
   }
 
