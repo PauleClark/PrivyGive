@@ -46,13 +46,17 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const detected = detectProvider();
     if (detected) {
       setProvider(detected);
+      try { (window as unknown as { ethereum?: EthereumProvider }).ethereum = (window as unknown as { ethereum?: EthereumProvider }).ethereum || detected; } catch {}
       return;
     }
     
     const handleEthereumDetected = () => {
       if (mounted) {
         const provider = detectProvider();
-        if (provider) setProvider(provider);
+        if (provider) {
+          setProvider(provider);
+          try { (window as unknown as { ethereum?: EthereumProvider }).ethereum = (window as unknown as { ethereum?: EthereumProvider }).ethereum || provider; } catch {}
+        }
       }
     };
     
@@ -68,6 +72,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
           discoveredRef.current.set(key, e.detail.provider);
           if (!provider && mounted) {
             setProvider(e.detail.provider);
+            try { (window as unknown as { ethereum?: EthereumProvider }).ethereum = (window as unknown as { ethereum?: EthereumProvider }).ethereum || e.detail.provider; } catch {}
           }
         }
       };
