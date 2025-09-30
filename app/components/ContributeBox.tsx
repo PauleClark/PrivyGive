@@ -18,7 +18,7 @@ interface ContributeBoxProps {
 }
 
 export default function ContributeBox({ poolAddress, actionLabel = "Participate", amountLabelPrivate = "Amount (zETHc)", amountLabelPublic = "Amount (ETH)" }: ContributeBoxProps) {
-  const { provider, address, isConnected } = useWallet();
+  const { provider, address } = useWallet();
   const [amount, setAmount] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
   const [busy, setBusy] = useState(false);
