@@ -159,6 +159,15 @@ export function HeaderWallet() {
     }
   }
 
+  async function handleConnect() {
+    try {
+      await connect();
+    } catch (err) {
+      const msg = (err as Error)?.message || String(err);
+      alert(`请先安装 MetaMask 钱包\n\nPlease install MetaMask wallet first\n\n${msg}`);
+    }
+  }
+
   async function switchToSepolia() {
     if (!provider) return;
     const target = "0xaa36a7"; // Sepolia
@@ -192,7 +201,7 @@ export function HeaderWallet() {
       </span>
       <button
         className="h-9 px-3 inline-flex items-center justify-center rounded-md border border-black/10 hover:bg-black/5"
-        onClick={() => (isConnected ? undefined : connect())}
+        onClick={() => (isConnected ? undefined : handleConnect())}
       >
         {isConnected ? "Connected" : "Connect Wallet"}
       </button>
