@@ -36,22 +36,39 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const chainHandlerRef = useRef<((data: unknown) => void) | null>(null);
 
   useEffect(() => {
-    // Try to detect provider immediately
+    let mounted = true;
+    
     const detected = detectProvider();
     if (detected) {
       setProvider(detected);
       return;
     }
     
-    // If not found, retry after a delay (MetaMask may inject asynchronously)
-    const timer = setTimeout(() => {
-      const retryDetected = detectProvider();
-      if (retryDetected) {
-        setProvider(retryDetected);
+    const handleEthereumDetected = () => {
+      if (mounted) {
+        const provider = detectProvider();
+        if (provider) setProvider(provider);
       }
-    }, 500);
+    };
     
-    return () => clearTimeout(timer);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('ethereum#initialized', handleEthereumDetected, { once: true });
+      
+      const timers = [100, 500, 1000, 2000].map(delay => 
+        setTimeout(() => {
+          if (mounted) {
+            const detected = detectProvider();
+            if (detected) setProvider(detected);
+          }
+        }, delay)
+      );
+      
+      return () => {
+        mounted = false;
+        window.removeEventListener('ethereum#initialized', handleEthereumDetected);
+        timers.forEach(t => clearTimeout(t));
+      };
+    }
   }, []);
 
   const refresh = useCallback(async () => {
