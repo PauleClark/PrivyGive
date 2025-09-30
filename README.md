@@ -110,7 +110,7 @@ Deploys and manages confidential funding pools.
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/privygive.git
+   git clone https://github.com/PauleClark/PrivyGive/tree/main
    cd privygive
    ```
 
@@ -181,13 +181,6 @@ npm run start
 
 ---
 
-## Running the Relayer
-
-The relayer is responsible for fulfilling decryption requests:
-
-```bash
-npm run relayer:fulfill
-```
 
 **Relayer Configuration:**
 - Update relayer private key in environment variables
@@ -252,12 +245,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## Resources
 
-- [Zama fhEVM Documentation](https://docs.zama.ai/fhevm)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Ethers.js Documentation](https://docs.ethers.org/)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
 ---
 
@@ -265,7 +253,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, suggestions, or support:
 - Open an issue on GitHub
-- Contact the development team
+
 
 ---
 

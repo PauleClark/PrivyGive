@@ -17,7 +17,7 @@ export type AppConfig = {
 export const appConfig: AppConfig = {
   chainId: 11155111,
   networkName: "sepolia",
-  rpcUrl: "https://eth-sepolia.g.alchemy.com/v2/  key", // shared public RPC; replace with your own service if needed
+  rpcUrl: "https://sepolia.infura.io/v3/d0e0bcc49d21445fa6806397b56c1175", // shared public RPC; replace with your own service if needed
   zethcAddress: "0x5E78fb61F973f462712c280DF0d73Bed63F91AB6",
   launchAddress: "0x95E8250c6cc42148d8D067C1AAF6b6d961be338f",
   factoryAddress: "0xc1d3344B16cDfc10bFDe73169daF9F817EA46f5F",    // LaunchpadFactory address

@@ -22,7 +22,9 @@ const WalletContext = createContext<WalletState | null>(null);
 function detectProvider(): EthereumProvider | null {
   if (typeof window === "undefined") return null;
   const anyWindow = window as { ethereum?: EthereumProvider };
+  // Check multiple times as MetaMask may inject asynchronously
   if (anyWindow.ethereum) return anyWindow.ethereum as EthereumProvider;
+  // Check again after a brief delay for async injection
   return null;
 }
 
@@ -34,7 +36,22 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const chainHandlerRef = useRef<((data: unknown) => void) | null>(null);
 
   useEffect(() => {
-    setProvider(detectProvider());
+    // Try to detect provider immediately
+    const detected = detectProvider();
+    if (detected) {
+      setProvider(detected);
+      return;
+    }
+    
+    // If not found, retry after a delay (MetaMask may inject asynchronously)
+    const timer = setTimeout(() => {
+      const retryDetected = detectProvider();
+      if (retryDetected) {
+        setProvider(retryDetected);
+      }
+    }, 500);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const refresh = useCallback(async () => {
@@ -76,10 +93,17 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   }, [provider, refresh]);
 
   const connect = useCallback(async () => {
-    if (!provider) throw new Error("Ethereum wallet not found");
-    const accounts = await provider.request({ method: "eth_requestAccounts" }) as string[];
+    // Re-detect provider in case it was injected after initial load
+    const currentProvider = provider || detectProvider();
+    if (!currentProvider) {
+      throw new Error("Ethereum wallet not found");
+    }
+    if (!provider) {
+      setProvider(currentProvider);
+    }
+    const accounts = await currentProvider.request({ method: "eth_requestAccounts" }) as string[];
     setAddress(accounts && accounts.length > 0 ? accounts[0] : null);
-    const cid = await provider.request({ method: "eth_chainId" }) as string;
+    const cid = await currentProvider.request({ method: "eth_chainId" }) as string;
     setChainId(cid || null);
   }, [provider]);
 

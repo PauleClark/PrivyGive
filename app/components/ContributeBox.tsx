@@ -8,6 +8,7 @@ import { IDOPoolAbi } from "@/abi/IDOPool";
 import { ConfidentialZETHAbi } from "@/abi/ConfidentialZETH";
 import appConfig from "@/config/app.config";
 import { encryptEuint64 } from "@/fhevm/relayer";
+import { useWallet } from "@/app/wallet-provider";
 
 interface ContributeBoxProps {
   poolAddress: string;
@@ -17,6 +18,7 @@ interface ContributeBoxProps {
 }
 
 export default function ContributeBox({ poolAddress, actionLabel = "Participate", amountLabelPrivate = "Amount (zETHc)", amountLabelPublic = "Amount (ETH)" }: ContributeBoxProps) {
+  const { provider, address, isConnected } = useWallet();
   const [amount, setAmount] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -76,12 +78,9 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
     setBalanceLoading(true);
     try {
       setCurrentStep("Connecting wallet...");
-      const eth = (window as unknown as { ethereum?: unknown }).ethereum as { request: (args: { method: string; params?: unknown[] | object }) => Promise<unknown> } | undefined;
-      if (!eth) { showToast("Please connect your wallet first"); return; }
-      const accountsResp = await eth.request({ method: "eth_requestAccounts" });
-      const accounts = Array.isArray(accountsResp) ? (accountsResp as string[]) : [];
-      const from = accounts[0];
-      if (!from) { showToast("No wallet address"); return; }
+      if (!provider) { showToast("Please connect your wallet first"); return; }
+      if (!address) { showToast("No wallet address"); return; }
+      const from = address;
 
       setCurrentStep("Initializing FHE SDK...");
       const { ensureRelayer, userDecryptEuint64 } = await import("@/fhevm/relayer");
