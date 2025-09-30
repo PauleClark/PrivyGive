@@ -8,6 +8,10 @@ type EthereumProvider = {
   removeListener?: (event: string, handler: (data: unknown) => void) => void;
 };
 
+// EIP-6963 multi-wallet discovery types
+type Eip6963ProviderInfo = { uuid: string; name: string; icon: string; rdns: string };
+type Eip6963AnnounceEvent = CustomEvent<{ info: Eip6963ProviderInfo; provider: EthereumProvider }>;
+
 type WalletState = {
   provider: EthereumProvider | null;
   address: string | null;
@@ -34,6 +38,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [chainId, setChainId] = useState<string | null>(null);
   const accountsHandlerRef = useRef<((data: unknown) => void) | null>(null);
   const chainHandlerRef = useRef<((data: unknown) => void) | null>(null);
+  const discoveredRef = useRef<Map<string, EthereumProvider> | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -53,6 +58,22 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     
     if (typeof window !== 'undefined') {
       window.addEventListener('ethereum#initialized', handleEthereumDetected, { once: true });
+
+      // EIP-6963 discovery: collect providers and pick the first if no window.ethereum
+      discoveredRef.current = new Map<string, EthereumProvider>();
+      const onAnnounce = (evt: Event) => {
+        const e = evt as Eip6963AnnounceEvent;
+        const key = e.detail.info?.rdns || e.detail.info?.uuid;
+        if (key && e.detail.provider && discoveredRef.current) {
+          discoveredRef.current.set(key, e.detail.provider);
+          if (!provider && mounted) {
+            setProvider(e.detail.provider);
+          }
+        }
+      };
+      window.addEventListener('eip6963:announceProvider', onAnnounce as EventListener);
+      // Request providers to announce themselves
+      try { window.dispatchEvent(new Event('eip6963:requestProvider')); } catch {}
       
       const timers = [100, 500, 1000, 2000].map(delay => 
         setTimeout(() => {
@@ -66,6 +87,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       return () => {
         mounted = false;
         window.removeEventListener('ethereum#initialized', handleEthereumDetected);
+        window.removeEventListener('eip6963:announceProvider', onAnnounce as EventListener);
         timers.forEach(t => clearTimeout(t));
       };
     }
@@ -111,7 +133,16 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const connect = useCallback(async () => {
     // Re-detect provider in case it was injected after initial load
-    const currentProvider = provider || detectProvider();
+    let currentProvider = provider || detectProvider();
+    // If not found, try EIP-6963 request and wait briefly
+    if (!currentProvider && typeof window !== 'undefined') {
+      try { window.dispatchEvent(new Event('eip6963:requestProvider')); } catch {}
+      await new Promise((r) => setTimeout(r, 300));
+      if (discoveredRef.current && discoveredRef.current.size > 0) {
+        const first = discoveredRef.current.values().next().value as EthereumProvider | undefined;
+        if (first) currentProvider = first;
+      }
+    }
     if (!currentProvider) {
       throw new Error("Ethereum wallet not found");
     }
