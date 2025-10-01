@@ -8,7 +8,7 @@ import { IDOPoolAbi } from "@/abi/IDOPool";
 import { ConfidentialZETHAbi } from "@/abi/ConfidentialZETH";
 import appConfig from "@/config/app.config";
 import { encryptEuint64 } from "@/fhevm/relayer";
-import { useWallet } from "@/app/wallet-provider";
+import { useWallet, switchToSepoliaNetwork } from "@/app/wallet-provider";
 
 interface ContributeBoxProps {
   poolAddress: string;
@@ -18,7 +18,7 @@ interface ContributeBoxProps {
 }
 
 export default function ContributeBox({ poolAddress, actionLabel = "Participate", amountLabelPrivate = "Amount (zETHc)", amountLabelPublic = "Amount (ETH)" }: ContributeBoxProps) {
-  const { provider, address } = useWallet();
+  const { provider, address, chainId } = useWallet();
   const [amount, setAmount] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -27,6 +27,8 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
   const [balanceLoading, setBalanceLoading] = useState(false);
   const [ethBalance, setEthBalance] = useState<string>("");
   const [currentStep, setCurrentStep] = useState<string>("");
+  const [showNetworkModal, setShowNetworkModal] = useState(false);
+  const [networkSwitching, setNetworkSwitching] = useState(false);
 
   function shortAddress(addr?: string): string {
     if (!addr) return "-";
@@ -74,7 +76,24 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
     }
   }, []);
 
+  async function handleSwitchNetwork() {
+    setNetworkSwitching(true);
+    try {
+      await switchToSepoliaNetwork(provider || undefined);
+      setShowNetworkModal(false);
+      showToast("Network switched to Sepolia");
+    } catch (err) {
+      showToast((err as Error)?.message || "Failed to switch network");
+    } finally {
+      setNetworkSwitching(false);
+    }
+  }
+
   async function onCheckBalance() {
+    if (chainId?.toLowerCase() !== "0xaa36a7") {
+      setShowNetworkModal(true);
+      return;
+    }
     setBalanceLoading(true);
     try {
       setCurrentStep("Connecting wallet...");
@@ -126,6 +145,10 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
   }
 
   async function onContribute() {
+    if (chainId?.toLowerCase() !== "0xaa36a7") {
+      setShowNetworkModal(true);
+      return;
+    }
     try {
       if (!amount) return;
       setBusy(true);
@@ -343,6 +366,32 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
         <div className="fixed top-4 right-4 z-30">
           <div className="rounded-md border border-black/10 bg-white px-3 py-2 shadow max-w-xs">
             <div className="text-sm break-all whitespace-pre-wrap">{toast}</div>
+          </div>
+        </div>
+      )}
+
+      {showNetworkModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowNetworkModal(false)}>
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold mb-2">Wrong Network</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Please switch to Sepolia network to continue.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSwitchNetwork}
+                disabled={networkSwitching}
+                className="flex-1 h-10 px-4 rounded-md bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
+              >
+                {networkSwitching ? "Switching..." : "Switch to Sepolia"}
+              </button>
+              <button
+                onClick={() => setShowNetworkModal(false)}
+                className="h-10 px-4 rounded-md border border-gray-300 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

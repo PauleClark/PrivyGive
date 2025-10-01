@@ -39,34 +39,6 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const accountsHandlerRef = useRef<((data: unknown) => void) | null>(null);
   const chainHandlerRef = useRef<((data: unknown) => void) | null>(null);
   const discoveredRef = useRef<Map<string, EthereumProvider> | null>(null);
-  
-  async function ensureSepoliaNetwork(p?: EthereumProvider): Promise<void> {
-    const eth = p || provider;
-    if (!eth) throw new Error("No provider");
-    const target = "0xaa36a7";
-    try {
-      await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: target }] });
-    } catch (err: unknown) {
-      const e = err as { code?: number; message?: string };
-      if (e?.code === 4902 || e?.message?.includes("Unrecognized chain ID")) {
-        await eth.request({
-          method: "wallet_addEthereumChain",
-          params: [{
-            chainId: target,
-            chainName: "Sepolia",
-            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-            rpcUrls: ["https://rpc.sepolia.org"],
-            blockExplorerUrls: ["https://sepolia.etherscan.io"],
-          }],
-        });
-        await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: target }] });
-      } else if (e?.code === 4001) {
-        throw new Error("User rejected network switch");
-      } else {
-        throw new Error(e?.message || "Failed to switch to Sepolia");
-      }
-    }
-  }
 
   useEffect(() => {
     let mounted = true;
@@ -208,6 +180,35 @@ export function useWallet() {
   const ctx = useContext(WalletContext);
   if (!ctx) throw new Error("useWallet must be used within WalletProvider");
   return ctx;
+}
+
+export async function switchToSepoliaNetwork(p?: EthereumProvider): Promise<void> {
+  if (typeof window === "undefined") throw new Error("Not in browser");
+  const eth = p || (window as { ethereum?: EthereumProvider }).ethereum;
+  if (!eth) throw new Error("No provider");
+  const target = "0xaa36a7";
+  try {
+    await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: target }] });
+  } catch (err: unknown) {
+    const e = err as { code?: number; message?: string };
+    if (e?.code === 4902 || e?.message?.includes("Unrecognized chain ID")) {
+      await eth.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: target,
+          chainName: "Sepolia",
+          nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+          rpcUrls: ["https://rpc.sepolia.org"],
+          blockExplorerUrls: ["https://sepolia.etherscan.io"],
+        }],
+      });
+      await eth.request({ method: "wallet_switchEthereumChain", params: [{ chainId: target }] });
+    } else if (e?.code === 4001) {
+      throw new Error("User rejected network switch");
+    } else {
+      throw new Error(e?.message || "Failed to switch to Sepolia");
+    }
+  }
 }
 
 export function HeaderWallet() {
