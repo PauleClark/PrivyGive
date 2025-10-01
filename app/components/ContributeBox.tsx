@@ -76,6 +76,15 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
     }
   }, []);
 
+  useEffect(() => {
+    if (address && chainId && chainId.toLowerCase() !== "0xaa36a7") {
+      const timer = setTimeout(() => {
+        setShowNetworkModal(true);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [address, chainId]);
+
   async function handleSwitchNetwork() {
     setNetworkSwitching(true);
     try {
