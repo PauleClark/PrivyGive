@@ -169,6 +169,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   const disconnect = useCallback(() => {
     setAddress(null);
+    setChainId(null);
   }, []);
 
   const value = useMemo<WalletState>(() => ({
@@ -219,7 +220,8 @@ export async function switchToSepoliaNetwork(p?: EthereumProvider): Promise<void
 }
 
 export function HeaderWallet() {
-  const { isConnected, connect, address, chainId, provider } = useWallet();
+  const { isConnected, connect, disconnect, address, chainId } = useWallet();
+  const [showMenu, setShowMenu] = React.useState(false);
 
   function chainNameFromId(id: string | null): string {
     if (!id) return "Not connected";
@@ -256,52 +258,110 @@ export function HeaderWallet() {
     }
   }
 
-  async function switchToSepolia() {
-    if (!provider) return;
-    const target = "0xaa36a7"; // Sepolia
-    try {
-      await provider.request({ method: "wallet_switchEthereumChain", params: [{ chainId: target }] });
-    } catch (err: unknown) {
-      if (err && typeof err === 'object' && ((err as { code?: number }).code === 4902 || (err as { message?: string }).message?.includes("Unrecognized chain ID"))) {
-        try {
-          await provider.request({
-            method: "wallet_addEthereumChain",
-            params: [{
-              chainId: target,
-              chainName: "Sepolia",
-              nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
-              rpcUrls: ["https://rpc.sepolia.org"],
-              blockExplorerUrls: ["https://sepolia.etherscan.io"],
-            }],
-          });
-        } catch (addErr) {
-          console.error("wallet_addEthereumChain failed", addErr);
-        }
-      } else {
-        console.error("wallet_switchEthereumChain failed", err);
-      }
-    }
+  function handleDisconnect() {
+    disconnect();
+    setShowMenu(false);
   }
+
+  React.useEffect(() => {
+    if (!isConnected) setShowMenu(false);
+  }, [isConnected]);
+
   return (
     <div className="flex items-center gap-2">
       <span className="text-xs text-black/70 min-w-[160px] truncate">
         {isConnected ? `${address?.slice(0, 6)}...${address?.slice(-4)} · ${chainNameFromId(chainId)}` : "Not connected"}
       </span>
-      <button
-        className="h-9 px-3 inline-flex items-center justify-center rounded-md border border-black/10 hover:bg-black/5"
-        onClick={() => (isConnected ? undefined : handleConnect())}
-      >
-        {isConnected ? "Connected" : "Connect Wallet"}
-      </button>
-      {isConnected && chainId?.toLowerCase() !== "0xaa36a7" && (
+      {isConnected ? (
+        <div className="relative">
+          <button
+            className="h-9 px-3 inline-flex items-center justify-center rounded-md border border-black/10 hover:bg-black/5"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            Connected
+            <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          {showMenu && (
+            <>
+              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
+              <div className="absolute right-0 top-full mt-1 w-40 bg-white rounded-md border border-black/10 shadow-lg z-20">
+                <button
+                  onClick={handleDisconnect}
+                  className="w-full px-4 py-2 text-sm text-left hover:bg-black/5 rounded-md"
+                >
+                  Disconnect
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      ) : (
         <button
           className="h-9 px-3 inline-flex items-center justify-center rounded-md border border-black/10 hover:bg-black/5"
-          onClick={switchToSepolia}
+          onClick={handleConnect}
         >
-          Switch to Sepolia
+          Connect Wallet
         </button>
       )}
     </div>
+  );
+}
+
+export function NetworkGuard({ children }: { children: React.ReactNode }) {
+  const { address, chainId, provider } = useWallet();
+  const [showModal, setShowModal] = React.useState(false);
+  const [switching, setSwitching] = React.useState(false);
+
+  React.useEffect(() => {
+    if (address && chainId) {
+      const normalized = chainId.toLowerCase();
+      if (normalized !== "0xaa36a7") {
+        setShowModal(true);
+      } else {
+        setShowModal(false);
+      }
+    } else {
+      setShowModal(false);
+    }
+  }, [address, chainId]);
+
+  async function handleSwitch() {
+    setSwitching(true);
+    try {
+      await switchToSepoliaNetwork(provider || undefined);
+      setShowModal(false);
+    } catch (err) {
+      console.error("Network switch failed:", err);
+    } finally {
+      setSwitching(false);
+    }
+  }
+
+  return (
+    <>
+      {children}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold mb-2">Wrong Network</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              This application only supports Sepolia network. Please switch to continue.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleSwitch}
+                disabled={switching}
+                className="flex-1 h-10 px-4 rounded-md bg-purple-600 text-white hover:bg-purple-700 disabled:opacity-50 transition-colors"
+              >
+                {switching ? "Switching..." : "Switch to Sepolia"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
