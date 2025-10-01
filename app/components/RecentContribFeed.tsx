@@ -121,6 +121,7 @@ export default function RecentContribFeed({ poolAddress }: RecentContribFeedProp
           const apiTxSet = new Set(mapped.map(m => m.tx).filter(Boolean));
           const uniqueLocal = localEntries.filter(e => !e.tx || !apiTxSet.has(e.tx));
           const merged = [...uniqueLocal, ...mapped];
+          merged.sort((a, b) => (b.ts || 0) - (a.ts || 0));
           saveLocalContributions(poolAddress, uniqueLocal);
           return merged.slice(0, 50);
         });
