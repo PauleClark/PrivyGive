@@ -76,7 +76,13 @@ export default function RecentContribFeed({ poolAddress }: RecentContribFeedProp
           ts: c.timestamp,
         }));
         
-        setEntries(mapped.slice(0, 50));
+        setEntries(prev => {
+          const localEntries = prev.filter(e => e.key.endsWith('-local'));
+          const apiTxSet = new Set(mapped.map(m => m.tx).filter(Boolean));
+          const uniqueLocal = localEntries.filter(e => !e.tx || !apiTxSet.has(e.tx));
+          const merged = [...uniqueLocal, ...mapped];
+          return merged.slice(0, 50);
+        });
       } catch (err) {
         console.error('Failed to fetch contributions:', err);
       }
