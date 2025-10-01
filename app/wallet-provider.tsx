@@ -39,6 +39,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
   const accountsHandlerRef = useRef<((data: unknown) => void) | null>(null);
   const chainHandlerRef = useRef<((data: unknown) => void) | null>(null);
   const discoveredRef = useRef<Map<string, EthereumProvider> | null>(null);
+  const providerSetRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -46,15 +47,17 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     const detected = detectProvider();
     if (detected) {
       setProvider(detected);
+      providerSetRef.current = true;
       try { (window as unknown as { ethereum?: EthereumProvider }).ethereum = (window as unknown as { ethereum?: EthereumProvider }).ethereum || detected; } catch {}
       return;
     }
     
     const handleEthereumDetected = () => {
-      if (mounted) {
+      if (mounted && !providerSetRef.current) {
         const provider = detectProvider();
         if (provider) {
           setProvider(provider);
+          providerSetRef.current = true;
           try { (window as unknown as { ethereum?: EthereumProvider }).ethereum = (window as unknown as { ethereum?: EthereumProvider }).ethereum || provider; } catch {}
         }
       }
@@ -70,8 +73,9 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
         const key = e.detail.info?.rdns || e.detail.info?.uuid;
         if (key && e.detail.provider && discoveredRef.current) {
           discoveredRef.current.set(key, e.detail.provider);
-          if (!provider && mounted) {
+          if (!providerSetRef.current && mounted) {
             setProvider(e.detail.provider);
+            providerSetRef.current = true;
             try { (window as unknown as { ethereum?: EthereumProvider }).ethereum = (window as unknown as { ethereum?: EthereumProvider }).ethereum || e.detail.provider; } catch {}
           }
         }
@@ -82,9 +86,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
       
       const timers = [100, 500, 1000, 2000].map(delay => 
         setTimeout(() => {
-          if (mounted) {
+          if (mounted && !providerSetRef.current) {
             const detected = detectProvider();
-            if (detected) setProvider(detected);
+            if (detected) {
+              setProvider(detected);
+              providerSetRef.current = true;
+            }
           }
         }, delay)
       );
