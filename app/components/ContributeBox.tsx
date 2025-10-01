@@ -77,11 +77,18 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
   }, []);
 
   useEffect(() => {
-    if (address && chainId && chainId.toLowerCase() !== "0xaa36a7") {
-      const timer = setTimeout(() => {
-        setShowNetworkModal(true);
-      }, 500);
-      return () => clearTimeout(timer);
+    console.log("Network check:", { address, chainId, showNetworkModal });
+    if (address && chainId) {
+      const normalized = chainId.toLowerCase();
+      console.log("Normalized chainId:", normalized, "Is Sepolia:", normalized === "0xaa36a7");
+      if (normalized !== "0xaa36a7") {
+        console.log("Wrong network detected, showing modal in 500ms");
+        const timer = setTimeout(() => {
+          console.log("Setting showNetworkModal to true");
+          setShowNetworkModal(true);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
     }
   }, [address, chainId]);
 
