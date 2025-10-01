@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as fs from "fs";
-import * as path from "path";
+import { put } from "@vercel/blob";
 
 export const runtime = "nodejs";
-
-function ensureDir(p: string) {
-  if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true });
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,20 +12,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "no files" }, { status: 400 });
     }
 
-    const baseDir = path.join(process.cwd(), "public", "uploads", "projects", id);
-    ensureDir(baseDir);
-
     const saved: string[] = [];
     let idx = 0;
     for (const f of files) {
       if (!(f instanceof File)) continue;
-      const arrayBuffer = await f.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
       const ext = (f.name.split(".").pop() || "png").toLowerCase();
-      const filename = `${idx++}.${ext}`;
-      const full = path.join(baseDir, filename);
-      fs.writeFileSync(full, buffer);
-      saved.push(`/uploads/projects/${id}/${filename}`);
+      const filename = `projects/${id}/${idx++}.${ext}`;
+      
+      const blob = await put(filename, f, {
+        access: "public",
+      });
+      
+      saved.push(blob.url);
     }
 
     return NextResponse.json({ id, files: saved });

@@ -1,36 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { kv } from '@vercel/kv';
 
-const DATA_FILE = path.join(process.cwd(), 'data', 'projects.json');
+const PROJECTS_KEY = 'fhe-launch:projects';
 
-function ensureDataDir() {
-  const dataDir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
-
-function readProjects() {
+async function readProjects() {
   try {
-    if (!fs.existsSync(DATA_FILE)) {
-      return [];
-    }
-    const data = fs.readFileSync(DATA_FILE, 'utf-8');
-    return JSON.parse(data);
+    const projects = await kv.get<unknown[]>(PROJECTS_KEY);
+    return projects || [];
   } catch {
     return [];
   }
 }
 
-function writeProjects(projects: unknown[]) {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(projects, null, 2));
+async function writeProjects(projects: unknown[]) {
+  await kv.set(PROJECTS_KEY, projects);
 }
 
 export async function GET() {
   try {
-    const projects = readProjects();
+    const projects = await readProjects();
     return NextResponse.json(projects);
   } catch {
     return NextResponse.json({ error: 'Failed to read projects' }, { status: 500 });
@@ -45,9 +33,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const projects = readProjects();
+    const projects = await readProjects();
     projects.push(projectData);
-    writeProjects(projects);
+    await writeProjects(projects);
 
     return NextResponse.json({ success: true, id: projectData.id });
   } catch {

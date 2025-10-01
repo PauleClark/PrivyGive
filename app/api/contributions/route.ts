@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs/promises";
-import path from "path";
+import { kv } from "@vercel/kv";
 
-const dataPath = path.join(process.cwd(), "data", "projects.json");
+const PROJECTS_KEY = 'fhe-launch:projects';
 
 interface Contribution {
   user: string;
@@ -38,8 +37,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const raw = await fs.readFile(dataPath, "utf-8");
-    const projects = JSON.parse(raw) as Project[];
+    const projects = await kv.get<Project[]>(PROJECTS_KEY) || [];
 
     const project = projects.find(
       (p: Project) => p.poolAddress?.toLowerCase() === poolAddress.toLowerCase()
@@ -61,7 +59,7 @@ export async function POST(req: Request) {
       timestamp: Date.now(),
     });
 
-    await fs.writeFile(dataPath, JSON.stringify(projects, null, 2), "utf-8");
+    await kv.set(PROJECTS_KEY, projects);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -82,8 +80,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Missing poolAddress" }, { status: 400 });
     }
 
-    const raw = await fs.readFile(dataPath, "utf-8");
-    const projects = JSON.parse(raw) as Project[];
+    const projects = await kv.get<Project[]>(PROJECTS_KEY) || [];
 
     const project = projects.find(
       (p: Project) => p.poolAddress?.toLowerCase() === poolAddress.toLowerCase()

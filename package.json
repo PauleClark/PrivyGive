@@ -10,6 +10,8 @@
     "relayer:fulfill": "node scripts/fulfillSwap.mjs"
   },
   "dependencies": {
+    "@vercel/blob": "^2.0.0",
+    "@vercel/kv": "^3.0.0",
     "ethers": "^6.13.4",
     "next": "15.5.2",
     "react": "19.1.0",

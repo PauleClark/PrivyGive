@@ -36,26 +36,66 @@ function formatEth(bi?: bigint) {
   return `${int.toString()}.${frac}`;
 }
 
+const LOCAL_STORAGE_KEY = "fhe-launch-local-contributions";
+
+function saveLocalContributions(poolAddress: string, entries: Entry[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    const stored = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || "{}");
+    const serialized = entries.map(e => ({
+      ...e,
+      amountWei: e.amountWei?.toString(),
+    }));
+    stored[poolAddress.toLowerCase()] = serialized;
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(stored));
+  } catch (err) {
+    console.error("Failed to save local contributions:", err);
+  }
+}
+
+function loadLocalContributions(poolAddress: string): Entry[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const stored = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || "{}");
+    const serialized = stored[poolAddress.toLowerCase()] || [];
+    return serialized.map((e: Entry & { amountWei?: string }) => ({
+      ...e,
+      amountWei: e.amountWei ? BigInt(e.amountWei) : undefined,
+    }));
+  } catch (err) {
+    console.error("Failed to load local contributions:", err);
+    return [];
+  }
+}
+
 export default function RecentContribFeed({ poolAddress }: RecentContribFeedProps) {
   const [entries, setEntries] = useState<Entry[]>([]);
 
   useEffect(() => {
     let stopped = false;
     
+    const localEntries = loadLocalContributions(poolAddress);
+    if (localEntries.length > 0) {
+      setEntries(localEntries);
+    }
+    
     function onLocal(e: Event) {
       const d = (e as CustomEvent).detail as { pool: string; user: string; isPrivate: boolean; amountWei?: bigint; tx?: string };
       if (!d || d.pool?.toLowerCase() !== poolAddress.toLowerCase()) return;
-      setEntries(prev => [
-        { 
-          key: `${d.tx || Date.now()}-local`, 
-          user: d.user, 
-          isPrivate: d.isPrivate, 
-          amountWei: d.amountWei, 
-          tx: d.tx, 
-          ts: Date.now() 
-        }, 
-        ...prev
-      ].slice(0, 50));
+      const newEntry = { 
+        key: `${d.tx || Date.now()}-local`, 
+        user: d.user, 
+        isPrivate: d.isPrivate, 
+        amountWei: d.amountWei, 
+        tx: d.tx, 
+        ts: Date.now() 
+      };
+      setEntries(prev => {
+        const updated = [newEntry, ...prev].slice(0, 50);
+        const localOnly = updated.filter(e => e.key.endsWith('-local'));
+        saveLocalContributions(poolAddress, localOnly);
+        return updated;
+      });
     }
     window.addEventListener("pool:new-contribution", onLocal as EventListener);
 
@@ -81,6 +121,7 @@ export default function RecentContribFeed({ poolAddress }: RecentContribFeedProp
           const apiTxSet = new Set(mapped.map(m => m.tx).filter(Boolean));
           const uniqueLocal = localEntries.filter(e => !e.tx || !apiTxSet.has(e.tx));
           const merged = [...uniqueLocal, ...mapped];
+          saveLocalContributions(poolAddress, uniqueLocal);
           return merged.slice(0, 50);
         });
       } catch (err) {
