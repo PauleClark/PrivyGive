@@ -84,7 +84,8 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
 
       setCurrentStep("Initializing FHE SDK...");
       const { ensureRelayer, userDecryptEuint64 } = await import("@/fhevm/relayer");
-      await ensureRelayer({ requireInstance: true }).catch(() => { throw new Error("Relayer SDK not initialized"); });
+ 
+      await ensureRelayer({ requireInstance: true });
 
       setCurrentStep("Fetching encrypted balance...");
       const publicClient = createPublicClient({ chain: sepolia, transport: http(appConfig.rpcUrl) });
