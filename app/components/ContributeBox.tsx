@@ -216,7 +216,20 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ poolAddress, user, isPrivate: true, tx: receipt.transactionHash }),
-          }).catch(err => console.error("Failed to save contribution:", err));
+          })
+            .then(res => {
+              if (!res.ok) {
+                console.error("Failed to save contribution, status:", res.status);
+                return res.text().then(text => {
+                  console.error("Response:", text);
+                  showToast(`Warning: Contribution succeeded but failed to save record (${res.status})`);
+                });
+              }
+            })
+            .catch(err => {
+              console.error("Failed to save contribution:", err);
+              showToast("Warning: Contribution succeeded but failed to save record");
+            });
           
           setCurrentStep("Contribution successful!");
           showToast("Contribution successful!");
@@ -251,7 +264,20 @@ export default function ContributeBox({ poolAddress, actionLabel = "Participate"
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ poolAddress, user, isPrivate: false, amountWei: amountWei.toString(), tx: receipt.transactionHash }),
-          }).catch(err => console.error("Failed to save contribution:", err));
+          })
+            .then(res => {
+              if (!res.ok) {
+                console.error("Failed to save contribution, status:", res.status);
+                return res.text().then(text => {
+                  console.error("Response:", text);
+                  showToast(`Warning: Contribution succeeded but failed to save record (${res.status})`);
+                });
+              }
+            })
+            .catch(err => {
+              console.error("Failed to save contribution:", err);
+              showToast("Warning: Contribution succeeded but failed to save record");
+            });
           
           setCurrentStep("Contribution successful!");
           showToast("Contribution successful!");
