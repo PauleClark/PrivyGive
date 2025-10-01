@@ -2,8 +2,11 @@ import { kv } from '@vercel/kv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 const dataPath = path.join(__dirname, '..', 'data', 'projects.json');
 
 async function migrate() {
